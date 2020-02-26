@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>New Book Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+    <!-- SITE NAVIGATION -->
+    <div class="container">
+        <div id="nav">
+          {% block nav %}
+            <h1>Welcome to Twitoff</h1>
+            <ul>
+              <li><a href="/">Home Page</a></li>
+              <li><a href="/new">Add Users</a></li>
+            </ul>
+          {% endblock %}
+        </div>
+        <hr>
+
+    <h1>New User</h1>
+
+    <p>Please fill out the form and submit a new participant!</p>
+
+
+    <form action="/new/create" method="POST">
+
+        <label>User:</label>
+        <input type="text" name="user" placeholder="username" value="username">
+
+        <button>Submit</button>
+    </form>
+    
+{% block title %}
+    <title>Add Users</title>
+{% endblock %}
+
+{% block content %}
+
+    <h2>Users</h2>
+
+    <p>{{ message }}</p>
+
+    {% if users %}
+        <ul>
+        {% for user in users %}
+            <li>{{ user["screen_name"] }}</li>
+        {% endfor %}
+        </ul>
+
+    {% else %}
+        <p>no users found.</p>
+    {% endif %}
+
+{% endblock %}
+
+</body>
+</html>
