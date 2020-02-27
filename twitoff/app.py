@@ -1,9 +1,11 @@
 # set FLASK_APP=twitoff.app.py
+import numpy as np
 from flask import Flask, request, render_template, jsonify, flash, redirect
 from flask_migrate import Migrate
 from twitoff.models import db, migrate, User, Tweet
 from twitoff.twitter_service import twitter_api
 from twitoff.basilica_service import basilica_api
+from sklearn.linear_model import LogisticRegression
 
 twitter_api_client = twitter_api()
 basilica_client = basilica_api()
@@ -52,7 +54,7 @@ def create_app():
             db.session.add(db_user)
             db.session.commit()
         
-            statuses = twitter_api_client.user_timeline(request.form["user"], tweet_mode="extended", count=50, exclude_replies=True, include_rts=False)
+            statuses = twitter_api_client.user_timeline(request.form["user"], tweet_mode="extended", count=300, exclude_replies=True, include_rts=False)
             #db_tweets = []
             for status in statuses:
                 print(status.full_text)
@@ -75,8 +77,72 @@ def create_app():
         except:
             return jsonify({"message": "OOPS User Not Found!"})
         
+    
+    @app.route("/new/predict", methods=['Post'])
+    def predict():
+        # Get users and tweet from prediction form
+        user_a = request.form["user_a"]
+        user_b = request.form["user_b"]
+        tweet_text = request.form['tweet_text']
+
+        # Get tweets from database
+        user_a = User.query.filter(User.screen_name == user_a).one()
+        user_b =  User.query.filter(User.screen_name == user_b).one()
+
+        #breakpoint()
+
+        # Train Model
+        user_a_embeddings = np.array([tweet.embedding for tweet in user_a.tweets])
+        user_b_embeddings = np.array([tweet.embedding for tweet in user_b.tweets])
+        embeddings = np.vstack([user_a_embeddings, user_b_embeddings])
+        labels = np.concatenate([np.ones(len(user_a.tweets)), np.zeros(len(user_b.tweets))])
+        classifier = LogisticRegression(random_state=0, solver='lbfgs').fit(embeddings, labels)
+
+        # Make Prediction
+        tweet_embedding = basilica_client.embed_sentence(tweet_text, model="twitter")
+        results = classifier.predict(np.array(tweet_embedding).reshape(1, -1))
         
-        
+        if int(results[0]) == 1:
+            prediction = user_a.name
+        else:
+            prediction = user_b.name
+
+        probs = classifier.predict_proba(np.array(tweet_embedding).reshape(1, -1))
+        if prediction == user_b.name:
+            prob = float(probs[:,0])
+        else:
+            prob = float(probs[:,1])
+
+        prob = prob*100
+        probability = f'{prob:.2f}'
+
+        return render_template("results.html",
+        user_a=user_a.name,
+        user_b=user_b.name,
+        tweet_text=tweet_text,
+        prediction=prediction,
+        probability=probability
+        )
+
+
+
+       
+    
+    
+    
+    
+    
+    
+    
+    @app.route("/reset")
+    def reset_db():
+        print(type(db))
+        db.drop_all()
+        db.create_all()
+        return jsonify({"message": "DB RESET OK"})  
+
+      
+            
         
         
         

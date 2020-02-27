@@ -13,6 +13,7 @@ basilica = "*"
 python-dotenv = "*"
 requests = "*"
 tweepy = "*"
+scikit-learn = "*"
 
 [requires]
 python_version = "3.7"

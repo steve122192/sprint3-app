@@ -14,10 +14,6 @@
         <div id="nav">
           {% block nav %}
             <h1>Welcome to Twitoff</h1>
-            <ul>
-              <li><a href="/">Home Page</a></li>
-              <li><a href="/new">Add Users</a></li>
-            </ul>
           {% endblock %}
         </div>
         <hr>
@@ -30,10 +26,12 @@
     <form action="/new/create" method="POST">
 
         <label>User:</label>
-        <input type="text" name="user" placeholder="username" value="username">
+        <input type="text" name="user" placeholder="enter a twitter username">
 
         <button>Submit</button>
     </form>
+
+   
     
 {% block title %}
     <title>Add Users</title>
@@ -41,9 +39,7 @@
 
 {% block content %}
 
-    <h2>Users</h2>
-
-    <p>{{ message }}</p>
+    <h2>Users Added</h2>
 
     {% if users %}
         <ul>
@@ -57,6 +53,26 @@
     {% endif %}
 
 {% endblock %}
+
+    <h1>Predict</h1>
+
+    <p>Write and tweet and predict which user is most likely to tweet it!</p>
+
+
+    <form action="/new/predict" method="POST">
+
+        <label>User A:</label>
+        <input type="text" name="user_a" placeholder="enter a username">
+        <br>
+        <label>User B:</label>
+        <input type="text" name="user_b" placeholder="enter a username">
+        <br>
+        <label>Tweet:</label>
+        <input type="text" name="tweet_text" size="50" placeholder="make up a tweet!">
+        <br>
+
+        <button>Submit</button>
+    </form>
 
 </body>
 </html>

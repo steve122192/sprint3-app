@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h2>Results!</h2>
+
+    <p>Between {{ user_a }} and {{ user_b }}
+        the user who is most likely to say "{{ tweet_text }}"
+        is {{ prediction }} with a probability level of {{ probability }}%
+    </p>
+
+{% endblock %}
