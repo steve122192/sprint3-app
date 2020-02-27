@@ -6,16 +6,21 @@ from twitoff.models import db, migrate, User, Tweet
 from twitoff.twitter_service import twitter_api
 from twitoff.basilica_service import basilica_api
 from sklearn.linear_model import LogisticRegression
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 twitter_api_client = twitter_api()
 basilica_client = basilica_api()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 def create_app():
     app = Flask(__name__)
 
     #add config for DB
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/movem/sprint3-app/db.sqlite3'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     #have the db know about the app
     db.init_app(app)
     migrate.init_app(app, db)
